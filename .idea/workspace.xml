@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="f2404c5d-ae0b-4244-b3b5-e15261584033" name="Default Changelist" comment="">
+    <list default="true" id="f2404c5d-ae0b-4244-b3b5-e15261584033" name="Default Changelist" comment="update">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/dcrnn_supervisor.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/dcrnn_supervisor.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,7 +35,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/dcrnn_train.py" />
-    <property name="settings.editor.selected.configurable" value="vcs.Git" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -229,7 +230,14 @@
       <option name="project" value="LOCAL" />
       <updated>1685860669453</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="update">
+      <created>1685860943638</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1685860943638</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -251,10 +259,10 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="244" y="66" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824@0.0.1536.824" timestamp="1685791284822" />
-    <state x="409" y="8" key="CommitChangelistDialog2" timestamp="1685860668708">
+    <state x="409" y="8" key="CommitChangelistDialog2" timestamp="1685861396969">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="409" y="8" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1685860668708" />
+    <state x="409" y="8" key="CommitChangelistDialog2/0.0.1536.824@0.0.1536.824" timestamp="1685861396969" />
     <state width="1322" height="466" key="DebuggerActiveHint" timestamp="1685792701716">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
@@ -299,18 +307,18 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state width="1515" height="261" key="GridCell.Tab.1.right/0.0.1536.824@0.0.1536.824" timestamp="1685799996937" />
-    <state x="270" y="54" key="SettingsEditor" timestamp="1685860938092">
+    <state x="124" y="42" key="SettingsEditor" timestamp="1685862257043">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="270" y="54" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1685860938092" />
+    <state x="124" y="42" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1685862257043" />
     <state x="614" y="328" key="VCS.ChangelistChooser" timestamp="1685850547371">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="614" y="328" key="VCS.ChangelistChooser/0.0.1536.824@0.0.1536.824" timestamp="1685850547371" />
-    <state x="361" y="134" key="Vcs.Push.Dialog.v2" timestamp="1685860670754">
+    <state x="361" y="134" key="Vcs.Push.Dialog.v2" timestamp="1685860945134">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="361" y="134" key="Vcs.Push.Dialog.v2/0.0.1536.824@0.0.1536.824" timestamp="1685860670754" />
+    <state x="361" y="134" key="Vcs.Push.Dialog.v2/0.0.1536.824@0.0.1536.824" timestamp="1685860945134" />
     <state width="775" height="419" key="XDebugger.FullValuePopup" timestamp="1685792689138">
       <screen x="0" y="0" width="1536" height="824" />
     </state>

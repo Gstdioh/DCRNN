@@ -223,14 +223,15 @@ class DCRNNSupervisor:
             # 保证日志输出整洁，0.1s
             time.sleep(0.1)
             for item in tqdm(self._data['train_loader']):
-                x = item['x'].to(self.device)
-                y = item['y'].to(self.device)
+                x = item['x'].to(self.device)  # (batch_size, history_length, num_nodes, 1)
+                y = item['y'].to(self.device)  # (batch_size, prediction_length, num_nodes, 1)
 
                 optimizer.zero_grad()
 
                 # TODO 源码这里做了预处理
                 # x, y = self._prepare_data(x, y)
 
+                # output (batch_size, horizon, num_nodes, output_dim)
                 output = self.dcrnn_model(x, y, batches_seen)
 
                 # TODO 不知道有什么用
