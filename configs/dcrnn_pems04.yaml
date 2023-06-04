@@ -17,7 +17,8 @@ data:
   prediction_length: 12  # 预测序列的长度
 
 model:
-  cl_decay_steps: 2000  # 用于 Scheduled Sampling 中概率 p 的递减
+  # METR-LA数据集共34272个，其设置了2000，PEMS04数据集共16992个，所以相应的这里应该设置1000
+  cl_decay_steps: 1000  # 用于 Scheduled Sampling 中概率 p 的递减
   use_curriculum_learning: true  # 即是否使用 Schedule Sampling
 #  filter_type: dual_random_walk  # 选择过滤器的类型，我的代码中只实现了双向
 
