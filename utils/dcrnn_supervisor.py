@@ -22,12 +22,15 @@ class DCRNNSupervisor:
         self.device = torch.device("cuda" if device == "cuda" and torch.cuda.is_available() else "cpu")
 
         # 用于梯度裁剪，只解决梯度爆炸问题，不解决梯度消失问题。
-        # self.max_grad_norm = self._train_kwargs.get('max_grad_norm', 1.)
+        self.max_grad_norm = self._train_kwargs.get('max_grad_norm', 1.)
 
-        # 该次运行所在的路径，最大为 runs/train100
-        self.runs_path = "runs/train100/"
+        # 数据集的名称，用于输出路径中的命名 runs/PEMS04/train
+        self.dataset_name = self._data_kwargs.get('data_file').split('/')[1]
+
+        # 该次运行结果所在的路径，最大为 runs/PEMS04/train100
+        self.runs_path = "runs/" + self.dataset_name + "/train100/"
         for i in range(1, 100):
-            self.runs_path = "runs/train{}/".format(i)
+            self.runs_path = "runs/" + self.dataset_name + "/train{}/".format(i)
             if not os.path.exists(self.runs_path):
                 os.makedirs(self.runs_path)
                 break
@@ -167,21 +170,21 @@ class DCRNNSupervisor:
             # TODO
             # self._writer.add_scalar('{} loss'.format(dataset), mean_loss, batches_seen)
 
-            # TODO 这里还不知道有什么用
-            # y_preds = np.concatenate(y_preds, axis=1)
-            # y_truths = np.concatenate(y_truths, axis=1)  # concatenate on batch dimension
-            #
-            # mode = dataset + '_data'
-            # y_truths_scaled = []
-            # y_preds_scaled = []
-            # for t in range(y_preds.shape[0]):
-            #     y_truth = self._data[mode].inverse_transform(y_truths[t])
-            #     y_pred = self._data[mode].inverse_transform(y_preds[t])
-            #     y_truths_scaled.append(y_truth)
-            #     y_preds_scaled.append(y_pred)
+            # 将输出结果返回，用于测试阶段
+            # (prediction_length, batches, num_nodes, output_dim)
+            y_preds = np.concatenate(y_preds, axis=1)
+            y_truths = np.concatenate(y_truths, axis=1)
 
-            # return mean_loss, {'prediction': y_preds_scaled, 'truth': y_truths_scaled}
-            return mean_loss
+            mode = dataset + '_data'
+            y_truths_scaled = []
+            y_preds_scaled = []
+            for t in range(y_preds.shape[0]):
+                y_truth = self._data[mode].inverse_transform(y_truths[t])
+                y_pred = self._data[mode].inverse_transform(y_preds[t])
+                y_truths_scaled.append(y_truth)
+                y_preds_scaled.append(y_pred)
+
+            return mean_loss, {'prediction': y_preds_scaled, 'truth': y_truths_scaled}
 
     def _train(self, base_lr,
                steps, patience=50, epochs=100, lr_decay_ratio=0.1, log_every=1, save_model=True,
@@ -228,9 +231,6 @@ class DCRNNSupervisor:
 
                 optimizer.zero_grad()
 
-                # TODO 源码这里做了预处理
-                # x, y = self._prepare_data(x, y)
-
                 # output (batch_size, horizon, num_nodes, output_dim)
                 output = self.dcrnn_model(x, y, batches_seen)
 
@@ -250,10 +250,9 @@ class DCRNNSupervisor:
 
                 loss.backward()
 
-                # TODO 梯度裁剪
                 # gradient clipping - this does it in place
                 # 梯度裁剪，只解决梯度爆炸问题，不解决梯度消失问题。
-                # torch.nn.utils.clip_grad_norm_(self.dcrnn_model.parameters(), self.max_grad_norm)
+                torch.nn.utils.clip_grad_norm_(self.dcrnn_model.parameters(), self.max_grad_norm)
 
                 optimizer.step()
 
@@ -265,10 +264,8 @@ class DCRNNSupervisor:
             # 每经过一个epoch，则进行验证
             self._logger.info("evaluating now!")
 
-            # TODO evaluate中的注释，不知道有什么用
             # 验证
-            # val_loss, _ = self.evaluate(dataset='val', batches_seen=batches_seen)
-            val_loss = self.evaluate(dataset='val', batches_seen=batches_seen)
+            val_loss, _ = self.evaluate(dataset='val', batches_seen=batches_seen)
 
             end_time = time.time()
 
@@ -287,9 +284,8 @@ class DCRNNSupervisor:
 
             # 每经过test_every_n_epochs（默认10）个epoch，显示一次测试的结果
             if (epoch_num % test_every_n_epochs) == test_every_n_epochs - 1:
-                # TODO evaluate中的注释，不知道有什么用
-                # test_loss, _ = self.evaluate(dataset='test', batches_seen=batches_seen)
-                test_loss = self.evaluate(dataset='test', batches_seen=batches_seen)
+                # 测试
+                test_loss, _ = self.evaluate(dataset='test', batches_seen=batches_seen)
                 message = 'Epoch [{}/{}] ({} batches_seen) train_mae: {:.4f}, test_mae: {:.4f},  lr: {:.6f}, ' \
                           '{:.1f}s'.format(epoch_num, epochs, batches_seen,
                                            np.mean(losses), test_loss, lr_scheduler.get_last_lr()[0],

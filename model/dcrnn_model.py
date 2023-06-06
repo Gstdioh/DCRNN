@@ -156,7 +156,6 @@ class DCRNNModel(nn.Module, Seq2SeqAttrs):
     def count_parameters(self):
         """
         计算可训练的参数个数，tensor 中的元素个数
-        :param model: 要计算参数的模型
         :return:
             int，参数个数
         """
@@ -286,28 +285,29 @@ class DCRNNModel(nn.Module, Seq2SeqAttrs):
 
 
 if __name__ == '__main__':
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-    with open(r"D:\1_program\0_Traffic_Predition\DCRNN_My\configs\dcrnn_pems04.yaml", 'r', encoding="utf-8") as f:
-        kwargs = yaml.safe_load(f)
-        data_kwargs = kwargs.get('data')
-        model_kwargs = kwargs.get('model')
-        train_kwargs = kwargs.get('train')
-
-        num_nodes = model_kwargs.get('num_nodes')
-        adj_mx = np.random.randn(num_nodes, num_nodes).astype(np.float32)
-        logger = logging.getLogger(__name__)
-
-        dcrnn_model = DCRNNModel(adj_mx, logger, **model_kwargs).to(device)
-
-        batch_size = data_kwargs.get('batch_size')
-        input_dim = model_kwargs.get('input_dim')
-        output_dim = model_kwargs.get('output_dim')
-        seq_len = model_kwargs.get('seq_len')
-        horizon = model_kwargs.get('horizon')
-        batch_seen = 0
-        x = torch.randn([batch_size, seq_len, num_nodes, input_dim]).to(device)
-        y = torch.randn([batch_size, horizon, num_nodes, output_dim]).to(device)
-
-        output = dcrnn_model(x, y, batch_seen)  # batch_size: 22 -> 32, used_gpu: 1820MB -> 2344MB, my_gpu: 4096MB
-        pass
+    pass
+    # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    #
+    # with open(r"D:\1_program\0_Traffic_Predition\DCRNN_My\configs\dcrnn_pems04.yaml", 'r', encoding="utf-8") as f:
+    #     kwargs = yaml.safe_load(f)
+    #     data_kwargs = kwargs.get('data')
+    #     model_kwargs = kwargs.get('model')
+    #     train_kwargs = kwargs.get('train')
+    #
+    #     num_nodes = model_kwargs.get('num_nodes')
+    #     adj_mx = np.random.randn(num_nodes, num_nodes).astype(np.float32)
+    #     logger = logging.getLogger(__name__)
+    #
+    #     dcrnn_model = DCRNNModel(adj_mx, logger, **model_kwargs).to(device)
+    #
+    #     batch_size = data_kwargs.get('batch_size')
+    #     input_dim = model_kwargs.get('input_dim')
+    #     output_dim = model_kwargs.get('output_dim')
+    #     seq_len = model_kwargs.get('seq_len')
+    #     horizon = model_kwargs.get('horizon')
+    #     batch_seen = 0
+    #     x = torch.randn([batch_size, seq_len, num_nodes, input_dim]).to(device)
+    #     y = torch.randn([batch_size, horizon, num_nodes, output_dim]).to(device)
+    #
+    #     output = dcrnn_model(x, y, batch_seen)  # batch_size: 22 -> 32, used_gpu: 1820MB -> 2344MB, my_gpu: 4096MB
+    #     pass

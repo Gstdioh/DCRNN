@@ -1,1 +1,6 @@
+# PyCharm
+.idea/
+
+dataset/
 runs/
+saved_model/

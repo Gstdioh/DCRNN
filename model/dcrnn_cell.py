@@ -115,7 +115,10 @@ class DConv(nn.Module):
         # x (batch_size * num_nodes, input_dim * num_matrices)
         # w (input_dim * num_matrices, output_dim)
         # xw -> x (batch_size * num_nodes, output_dim)
-        x = torch.matmul(x, self.weights)
+        try:
+            x = torch.matmul(x, self.weights)
+        except:
+            pass
 
         # b (1, output_dim)
         if self._bias_start is not None:

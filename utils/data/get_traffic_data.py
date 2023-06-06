@@ -24,9 +24,9 @@ class LoadData(Dataset):
         self.std = self.data[..., 0].std()
 
         # 对交通数据进行预处理
-        # (times, num_nodes, node_features) -> (times, num_nodes, 1) 速度
-        self.data = self.data[:, :, 0][:, :, np.newaxis]
-        # 进行归一化
+        # # (times, num_nodes, node_features) -> (times, num_nodes, 1) 速度，弃，不止一个特征
+        # self.data = self.data[:, :, 0][:, :, np.newaxis]
+        # 只对第一个特征（速度）进行归一化，其他特征是一天中所处的时间/所处的星期（可选）
         self.data[..., 0] = self.transform(self.data[..., 0])
 
     def __len__(self):
@@ -54,8 +54,8 @@ class LoadData(Dataset):
         y_start = x_end
         y_end = y_start + self.prediction_length
 
-        data_x = LoadData.to_tensor(self.data[x_start: x_end, :, :])  # (history_length, num_nodes, 1)
-        data_y = LoadData.to_tensor(self.data[y_start: y_end, :, :])  # (prediction_length, num_nodes, 1)
+        data_x = LoadData.to_tensor(self.data[x_start: x_end, :, :])  # (history_length, num_nodes, num_features)
+        data_y = LoadData.to_tensor(self.data[y_start: y_end, :, 0: 1])  # (prediction_length, num_nodes, 1)
 
         return {"x": data_x, "y": data_y}
 

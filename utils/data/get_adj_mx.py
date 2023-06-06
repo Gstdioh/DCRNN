@@ -28,6 +28,7 @@ def get_adjacency_matrix(distance_file, sensor_ids, graph_type="direct", normali
 
     # Fills cells in the matrix with distances.
     # 根据 distance 文件构建邻接矩阵
+    # from, to, dist
     with open(distance_file, "r") as f_d:
         f_d.readline()
         reader = csv.reader(f_d)  # 读取csv文件

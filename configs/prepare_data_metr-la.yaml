@@ -1,0 +1,17 @@
+---
+adj_data:
+  sensor_ids_file: dataset/METR-LA/sensor_graph/graph_sensor_ids.txt  # 节点个数，或者节点编号文件
+  distance_file: dataset/METR-LA/sensor_graph/distances_la_2012.csv
+  normalized_k: 0.1
+  output_pkl_file: null  # null表示默认路径
+
+traffic_data:
+  data_file: dataset/METR-LA/metr-la.h5
+  data_file_type: h5  # 数据集文件类型，后缀，['npz', 'h5']
+  add_time_in_day: true
+  add_time_in_week: false
+  output_npz_file: null  # null表示默认路径
+  split_list:  # 划分比例：训练集、验证集、测试集
+    - 7
+    - 1
+    - 2
