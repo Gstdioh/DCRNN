@@ -1,0 +1,13 @@
+# prepare
+# pems04
+python prepare_data.py --config_filename configs/prepare_data_pems04.yaml
+
+# metr-la
+python prepare_data.py --config_filename configs/prepare_data_metr-la.yaml
+
+# train
+# pems04
+python dcrnn_train.py --config_filename configs/dcrnn_pems04.yaml
+
+# metr-la
+python dcrnn_train.py --config_filename configs/dcrnn_metr-la.yaml

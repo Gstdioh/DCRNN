@@ -1,1 +1,0 @@
-python dcrnn_train.py --config_filename configs/dcrnn_pems04.yaml
