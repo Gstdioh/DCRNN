@@ -132,15 +132,28 @@ class DCRNNSupervisor:
 
     def show_metrics(self, preds, labels, base_message, null_val=np.nan):
         for i in range(len(preds)):
-            mae = utils.metrics.masked_mae(preds[i], labels[i], null_val=np.nan)
-            rmse = utils.metrics.masked_rmse(preds[i], labels[i], null_val=np.nan)
-            mape = utils.metrics.masked_mape(preds[i], labels[i], null_val=np.nan)
+            mae = utils.metrics.masked_mae(preds[i], labels[i], null_val=0.0)
+            rmse = utils.metrics.masked_rmse(preds[i], labels[i], null_val=0.0)
+            mape = utils.metrics.masked_mape(preds[i], labels[i], null_val=0.0)
 
             message = base_message + 'horizon{:2}, MAE: {:2.4f}, RMSE: {:2.4f}, MAPE: {:2.4f}'.format(
                 i + 1, mae, rmse, mape
             )
 
             self._logger.info(message)
+
+        preds = torch.stack(preds, dim=0)
+        labels = torch.stack(labels, dim=0)
+
+        mae = utils.metrics.masked_mae(preds, labels, null_val=0.0)
+        rmse = utils.metrics.masked_rmse(preds, labels, null_val=0.0)
+        mape = utils.metrics.masked_mape(preds, labels, null_val=0.0)
+
+        message = base_message + ' overall , MAE: {:2.4f}, RMSE: {:2.4f}, MAPE: {:2.4f}'.format(
+            mae, rmse, mape
+        )
+
+        self._logger.info(message)
 
     def train(self, **kwargs):
         kwargs.update(self._train_kwargs)
