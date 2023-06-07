@@ -158,7 +158,7 @@ class DCRNNSupervisor:
                 # 因为在 val 和 test 阶段中，Decoder 都用的预测值作为输入
                 output = self.dcrnn_model(x)
 
-                loss = self._compute_loss(y, output)
+                loss = self._compute_loss(y, output, dataset)
 
                 losses.append(loss.item())
 
@@ -175,11 +175,12 @@ class DCRNNSupervisor:
             y_truths = np.concatenate(y_truths, axis=0)
             y_preds = np.concatenate(y_preds, axis=0)
 
+            mode = dataset + '_data'
             y_truths_scaled = []
             y_preds_scaled = []
             for t in range(y_preds.shape[1]):
-                y_truth = self._data['scaler'].inverse_transform(y_truths[:, t, :, :])
-                y_pred = self._data['scaler'].inverse_transform(y_preds[:, t, :, :])
+                y_truth = self._data[mode].inverse_transform(y_truths[:, t, :, :])
+                y_pred = self._data[mode].inverse_transform(y_preds[:, t, :, :])
                 y_truths_scaled.append(y_truth)
                 y_preds_scaled.append(y_pred)
 
@@ -239,7 +240,7 @@ class DCRNNSupervisor:
                 #     optimizer = torch.optim.Adam(self.dcrnn_model.parameters(), lr=base_lr, eps=epsilon)
 
                 # 计算损失值 MAE，'train_data'表示用train的标准化参数来还原数据
-                loss = self._compute_loss(y, output)
+                loss = self._compute_loss(y, output, 'train')
 
                 self._logger.debug(loss.item())
 
@@ -311,7 +312,9 @@ class DCRNNSupervisor:
             if epoch_num % self.save_epoch == 0:
                 self.save_model(epoch_num, optimizer.state_dict())
 
-    def _compute_loss(self, y_true, y_predicted):
-        y_true = self._data['scaler'].inverse_transform(y_true)
-        y_predicted = self._data['scaler'].inverse_transform(y_predicted)
+    def _compute_loss(self, y_true, y_predicted, mode):
+        # mode: ['train', 'val', 'test']，表示用相应模式下的标准化
+        mode += '_data'
+        y_true = self._data[mode].inverse_transform(y_true)
+        y_predicted = self._data[mode].inverse_transform(y_predicted)
         return masked_mae_loss(y_predicted, y_true)
