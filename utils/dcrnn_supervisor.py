@@ -8,6 +8,7 @@ import torch
 import utils
 from utils import data
 from utils.loss import masked_mae_loss
+from utils import metrics
 from model.dcrnn_model import DCRNNModel
 
 
@@ -129,6 +130,18 @@ class DCRNNSupervisor:
 
         self._logger.info("Loaded model at {}".format(checkpoint['epoch']))
 
+    def show_metrics(self, preds, labels, base_message, null_val=np.nan):
+        for i in range(len(preds)):
+            mae = utils.metrics.masked_mae(preds[i], labels[i], null_val=np.nan)
+            rmse = utils.metrics.masked_rmse(preds[i], labels[i], null_val=np.nan)
+            mape = utils.metrics.masked_mape(preds[i], labels[i], null_val=np.nan)
+
+            message = base_message + 'horizon{:2}, MAE: {:2.4f}, RMSE: {:2.4f}, MAPE: {:2.4f}'.format(
+                i + 1, mae, rmse, mape
+            )
+
+            self._logger.info(message)
+
     def train(self, **kwargs):
         kwargs.update(self._train_kwargs)
         return self._train(**kwargs)
@@ -172,12 +185,14 @@ class DCRNNSupervisor:
 
             # 将输出结果返回，用于测试阶段
             # (batches, prediction_length, num_nodes, output_dim)
-            y_truths = np.concatenate(y_truths, axis=0)
-            y_preds = np.concatenate(y_preds, axis=0)
+            y_truths = torch.cat(y_truths, dim=0)
+            y_preds = torch.cat(y_preds, dim=0)
 
             y_truths_scaled = []
             y_preds_scaled = []
             for t in range(y_preds.shape[1]):
+                # 归一化对所有的数据都要统一！！！
+                # 之前我是分别对train、val、test进行不同的归一化，见dcrnn_supervisor_src.py代码
                 y_truth = self._data['scaler'].inverse_transform(y_truths[:, t, :, :])
                 y_pred = self._data['scaler'].inverse_transform(y_preds[:, t, :, :])
                 y_truths_scaled.append(y_truth)
@@ -264,7 +279,7 @@ class DCRNNSupervisor:
             self._logger.info("evaluating now!")
 
             # 验证
-            val_loss, _ = self.evaluate(dataset='val', batches_seen=batches_seen)
+            val_loss, val_results = self.evaluate(dataset='val', batches_seen=batches_seen)
 
             end_time = time.time()
 
@@ -275,21 +290,30 @@ class DCRNNSupervisor:
 
             # 每经过log_every（默认1）个epoch，显示一次训练和验证的结果
             if (epoch_num % log_every) == log_every - 1:
+                base_message = 'Epoch [{}/{}] ({} batches_seen) '.format(epoch_num, epochs, batches_seen)
                 message = 'Epoch [{}/{}] ({} batches_seen) train_mae: {:.4f}, val_mae: {:.4f}, lr: {:.6f}, ' \
                           '{:.1f}s'.format(epoch_num, epochs, batches_seen,
                                            np.mean(losses), val_loss, lr_scheduler.get_last_lr()[0],
                                            (end_time - start_time))
                 self._logger.info(message)
 
+                # 输出评价指标：MAE、RMSE、MAPE
+                self.show_metrics(val_results['prediction'], val_results['truth'], base_message)
+
             # 每经过test_every_n_epochs（默认10）个epoch，显示一次测试的结果
-            if (epoch_num % test_every_n_epochs) == test_every_n_epochs - 1:
+            if epoch_num % test_every_n_epochs == 0:
                 # 测试
-                test_loss, _ = self.evaluate(dataset='test', batches_seen=batches_seen)
+                test_loss, test_results = self.evaluate(dataset='test', batches_seen=batches_seen)
+
+                base_message = 'Epoch [{}/{}] ({} batches_seen) '.format(epoch_num, epochs, batches_seen)
                 message = 'Epoch [{}/{}] ({} batches_seen) train_mae: {:.4f}, test_mae: {:.4f},  lr: {:.6f}, ' \
                           '{:.1f}s'.format(epoch_num, epochs, batches_seen,
                                            np.mean(losses), test_loss, lr_scheduler.get_last_lr()[0],
                                            (end_time - start_time))
                 self._logger.info(message)
+
+                # 输出评价指标：MAE、RMSE、MAPE
+                self.show_metrics(test_results['prediction'], test_results['truth'], base_message)
 
             # 若验证过程的loss降低了，则保存一下模型（可选）
             if val_loss < min_val_loss:
@@ -312,6 +336,8 @@ class DCRNNSupervisor:
                 self.save_model(epoch_num, optimizer.state_dict())
 
     def _compute_loss(self, y_true, y_predicted):
+        # 归一化对所有的数据都要统一！！！
+        # 之前我是分别对train、val、test进行不同的归一化，见dcrnn_supervisor_src.py代码
         y_true = self._data['scaler'].inverse_transform(y_true)
         y_predicted = self._data['scaler'].inverse_transform(y_predicted)
         return masked_mae_loss(y_predicted, y_true)

@@ -108,6 +108,8 @@ def load_dataset(data_file, batch_size=32, val_batch_size=1, test_batch_size=1,
     all_data['val_loader'] = DataLoader(all_data['val_data'], val_batch_size, shuffle=False)
     all_data['test_loader'] = DataLoader(all_data['test_data'], test_batch_size, shuffle=False)
 
+    # 归一化对所有的数据都要统一！！！
+    # 之前我是分别对train、val、test进行不同的归一化，见get_traffic_data_src.py代码
     all_data['scaler'] = scaler
 
     return all_data
