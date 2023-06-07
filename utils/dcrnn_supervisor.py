@@ -130,11 +130,11 @@ class DCRNNSupervisor:
 
         self._logger.info("Loaded model at {}".format(checkpoint['epoch']))
 
-    def show_metrics(self, preds, labels, base_message, null_val=np.nan):
+    def show_metrics(self, preds, labels, base_message, null_val=0.0):
         for i in range(len(preds)):
-            mae = utils.metrics.masked_mae(preds[i], labels[i], null_val=0.0)
-            rmse = utils.metrics.masked_rmse(preds[i], labels[i], null_val=0.0)
-            mape = utils.metrics.masked_mape(preds[i], labels[i], null_val=0.0)
+            mae = utils.metrics.masked_mae(preds[i], labels[i], null_val=null_val)
+            rmse = utils.metrics.masked_rmse(preds[i], labels[i], null_val=null_val)
+            mape = utils.metrics.masked_mape(preds[i], labels[i], null_val=null_val)
 
             message = base_message + 'horizon{:2}, MAE: {:2.4f}, RMSE: {:2.4f}, MAPE: {:2.4f}'.format(
                 i + 1, mae, rmse, mape
@@ -159,7 +159,7 @@ class DCRNNSupervisor:
         kwargs.update(self._train_kwargs)
         return self._train(**kwargs)
 
-    def evaluate(self, dataset='val', batches_seen=0):
+    def evaluate(self, dataset='val'):
         """
         Computes mean L1Loss
         :return: mean L1Loss
@@ -292,7 +292,7 @@ class DCRNNSupervisor:
             self._logger.info("evaluating now!")
 
             # 验证
-            val_loss, val_results = self.evaluate(dataset='val', batches_seen=batches_seen)
+            val_loss, val_results = self.evaluate(dataset='val')
 
             end_time = time.time()
 
@@ -311,12 +311,12 @@ class DCRNNSupervisor:
                 self._logger.info(message)
 
                 # 输出评价指标：MAE、RMSE、MAPE
-                self.show_metrics(val_results['prediction'], val_results['truth'], base_message)
+                self.show_metrics(val_results['prediction'], val_results['truth'], base_message, 0.0)
 
             # 每经过test_every_n_epochs（默认10）个epoch，显示一次测试的结果
             if epoch_num % test_every_n_epochs == 0:
                 # 测试
-                test_loss, test_results = self.evaluate(dataset='test', batches_seen=batches_seen)
+                test_loss, test_results = self.evaluate(dataset='test')
 
                 base_message = 'Epoch [{}/{}] ({} batches_seen) '.format(epoch_num, epochs, batches_seen)
                 message = 'Epoch [{}/{}] ({} batches_seen) train_mae: {:.4f}, test_mae: {:.4f},  lr: {:.6f}, ' \
@@ -326,7 +326,7 @@ class DCRNNSupervisor:
                 self._logger.info(message)
 
                 # 输出评价指标：MAE、RMSE、MAPE
-                self.show_metrics(test_results['prediction'], test_results['truth'], base_message)
+                self.show_metrics(test_results['prediction'], test_results['truth'], base_message, 0.0)
 
             # 若验证过程的loss降低了，则保存一下模型（可选）
             if val_loss < min_val_loss:
