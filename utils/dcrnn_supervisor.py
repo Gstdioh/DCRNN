@@ -171,16 +171,16 @@ class DCRNNSupervisor:
             # self._writer.add_scalar('{} loss'.format(dataset), mean_loss, batches_seen)
 
             # 将输出结果返回，用于测试阶段
-            # (prediction_length, batches, num_nodes, output_dim)
-            y_preds = np.concatenate(y_preds, axis=1)
-            y_truths = np.concatenate(y_truths, axis=1)
+            # (batches, prediction_length, num_nodes, output_dim)
+            y_truths = np.concatenate(y_truths, axis=0)
+            y_preds = np.concatenate(y_preds, axis=0)
 
             mode = dataset + '_data'
             y_truths_scaled = []
             y_preds_scaled = []
-            for t in range(y_preds.shape[0]):
-                y_truth = self._data[mode].inverse_transform(y_truths[t])
-                y_pred = self._data[mode].inverse_transform(y_preds[t])
+            for t in range(y_preds.shape[1]):
+                y_truth = self._data[mode].inverse_transform(y_truths[:, t, :, :])
+                y_pred = self._data[mode].inverse_transform(y_preds[:, t, :, :])
                 y_truths_scaled.append(y_truth)
                 y_preds_scaled.append(y_pred)
 

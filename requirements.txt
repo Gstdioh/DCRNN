@@ -3,3 +3,4 @@ numpy
 PyYAML
 scipy
 tqdm
+tables
