@@ -118,15 +118,15 @@ class DCRNNSupervisor:
 
     def load_model(self):
         # 载入模型权重文件
-        checkpoint = torch.load(self._model_kwargs.get('model_state_pth'))
+        checkpoint = torch.load(self._train_kwargs.get('model_state_pth'))
 
         # 保存训练状态
-        self._saved_state = {'epoch': checkpoint['epoch'],
-                             'optimizer': checkpoint['optimizer'],
-                             'batches_seen': checkpoint['batches_seen']}
+        self._saved_state = {'model_state_dict': checkpoint['model_state_dict'],
+                             'epoch': checkpoint['epoch'],
+                             'optimizer_state_dict': checkpoint['optimizer_state_dict']}
 
         # 载入模型参数
-        self.dcrnn_model.load_state_dict(checkpoint['model'], strict=True)
+        self.dcrnn_model.load_state_dict(checkpoint['model_state_dict'], strict=True)
 
         self._logger.info("Loaded model at {}".format(checkpoint['epoch']))
 
