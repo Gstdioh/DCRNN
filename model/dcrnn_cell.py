@@ -32,7 +32,8 @@ class DConv(nn.Module):
         # 保证所有实例只计算一次，所有实例共享一个supports
         if not __class__.modified:
             # TODO：这里没有转置，源码中还进行了一次转置
-            supports = [utils.calculate_random_walk_matrix(adj_mx), utils.calculate_random_walk_matrix(adj_mx.T)]
+            # 经过实验，外面再加一个转置，效果更好
+            supports = [utils.calculate_random_walk_matrix(adj_mx).T, utils.calculate_random_walk_matrix(adj_mx.T).T]
             for support in supports:
                 # 将矩阵转换为sparse_coo_tensor格式，这样torch才可以处理
                 # 注意，这里我没有进行device的设置

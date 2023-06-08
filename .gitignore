@@ -4,3 +4,5 @@
 dataset/
 runs/
 saved_model/
+
+exp/

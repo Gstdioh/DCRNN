@@ -240,8 +240,8 @@ class DCRNNSupervisor:
         batches_seen = num_batches * (self._epoch_num + 1)
 
         # epoch 上一次训练的 epoch+1 开始计数，若第一次训练，则 self._epoch_num 为 -1
-        # 这里为了显示舒服，epoch_num 范围为 1 -> 100
-        for epoch_num in range(self._epoch_num + 2, epochs + 1):
+        # epoch_num 范围为 0 -> 99
+        for epoch_num in range(self._epoch_num + 1, epochs + 1):
 
             self.dcrnn_model = self.dcrnn_model.train()
 
@@ -302,7 +302,7 @@ class DCRNNSupervisor:
             #                         batches_seen)
 
             # 每经过log_every（默认1）个epoch，显示一次训练和验证的结果
-            if (epoch_num % log_every) == log_every - 1:
+            if (epoch_num + 1) % log_every == 0:
                 base_message = 'Epoch [{}/{}] ({} batches_seen) '.format(epoch_num, epochs, batches_seen)
                 message = 'Epoch [{}/{}] ({} batches_seen) train_mae: {:.4f}, val_mae: {:.4f}, lr: {:.6f}, ' \
                           '{:.1f}s'.format(epoch_num, epochs, batches_seen,
@@ -314,7 +314,7 @@ class DCRNNSupervisor:
                 self.show_metrics(val_results['prediction'], val_results['truth'], base_message, 0.0)
 
             # 每经过test_every_n_epochs（默认10）个epoch，显示一次测试的结果
-            if epoch_num % test_every_n_epochs == 0:
+            if (epoch_num + 1) % test_every_n_epochs == 0:
                 # 测试
                 test_loss, test_results = self.evaluate(dataset='test')
 
@@ -345,7 +345,7 @@ class DCRNNSupervisor:
                     break
 
             # 每经过 save_epoch，则保存一次模型，epoch_num 从 0 开始
-            if epoch_num % self.save_epoch == 0:
+            if (epoch_num + 1) % self.save_epoch == 0:
                 self.save_model(epoch_num, optimizer.state_dict())
 
     def _compute_loss(self, y_true, y_predicted):
