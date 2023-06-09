@@ -1,0 +1,65 @@
+---
+base_dir: data/model
+log_level: INFO  # logger 的级别
+data:
+  # 数据
+  data_file: dataset/METR-LA/metr-la_7_1_2.npz  # 数据文件
+  graph_pkl_filename: dataset/METR-LA/sensor_graph/adj_mx.pkl  # 邻接矩阵文件
+
+  # batch
+  batch_size: 32
+  val_batch_size: 32
+  test_batch_size: 32
+
+  # 用于创建数据集
+  time_interval: 5  # 时间间隔，默认 5min
+  history_length: 12  # 历史序列的长度
+  prediction_length: 12  # 预测序列的长度
+
+model:
+  # METR-LA数据集共34272个，其设置了2000
+  cl_decay_steps: 2000  # 用于 Scheduled Sampling 中概率 p 的递减
+  use_curriculum_learning: true  # 即是否使用 Schedule Sampling
+#  filter_type: dual_random_walk  # 选择过滤器的类型，我的代码中只实现了双向
+
+  input_dim: 2  # Encoder 中 DCGRUCell 的参数，输入的特征数
+  output_dim: 1  # Decoder 中 DCGRUCell 的参数，标签的特征数
+
+  seq_len: 12  # Encoder 中 GRU 的个数，历史序列的长度
+  horizon: 12  # Decoder 中 GRU 的个数，预测序列的长度
+
+  max_diffusion_step: 2  # Encoder、Decoder 中 DCGRUCell 的参数
+  num_rnn_layers: 2  # GRU的层数，若有两层GRU，则说明有两个GRU单元，然后所有输入共享两个单元的参数，即在两个单元中循环输入输出
+  num_units: 64  # 隐藏状态的特征维度，DCGRUCell 的参数
+
+#  num_nodes: 207  # 可以不需要，可以在 forward 中通过 inputs 来获取
+  l1_decay: 0
+
+train:
+  device: cuda  # ["cuda", "cpu"]
+
+  # 模型载入和保存参数
+  has_saved_state: false  # 是否有权重文件
+  model_state_pth: null  # 模型权重文件，包含模型参数和训练状态 ['model_state_dict', 'epoch', 'optimizer_state_dict']
+  save_model: true  # 是否保存模型参数和训练状态
+
+  # 学习率相关参数
+  base_lr: 0.01  # 初始学习率
+  lr_decay_ratio: 0.1  # 学习率的递减率
+  steps: [20, 30, 40, 50]  # MultiStepLR 每一个元素代表何时调整学习率
+  min_learning_rate: 2.0e-06
+
+  # 日志显示参数
+  log_every: 1  # 每经过log_every（默认1）个epoch，显示一次训练和验证的结果
+  test_every_n_epochs: 5  # 每经过test_every_n_epochs（默认10）个epoch，显示一次测试的结果
+
+  epochs: 100  # 训练总epoch数
+  patience: 50  # 若经过50epoch，loss还没有降低，则退出训练
+  save_epoch: 10  # 每训练 save_epoch，则保存一次模型
+
+  epsilon: 1.0e-3
+  global_step: 0
+  max_grad_norm: 5
+  max_to_keep: 100
+  optimizer: adam
+  dropout: 0

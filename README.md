@@ -20,18 +20,30 @@ python prepare_data.py --config_filename configs/prepare_data_pems04.yaml
 python prepare_data.py --config_filename configs/prepare_data_metr-la.yaml
 ```
 
-`python prepare_data.py --config_filename configs/prepare_data_pems04.yaml`
-
-## 训练DCRNN模型（单精度 float）
+## 训练模型（单精度 float）
 
 运行以下命令，即可开始进行训练，如：具体配置可以查看文件 `configs/dcrnn_pems04.yaml`
 
 ```shell script
 # pems04
-python dcrnn_train.py --config_filename configs/dcrnn_pems04.yaml
+python dcrnn_train.py --config_filename configs/pems04_train.yaml
 
 # metr-la
-python dcrnn_train.py --config_filename configs/dcrnn_metr-la.yaml
+python dcrnn_train.py --config_filename configs/metr-la_train.yaml
 ```
 
 如：权重文件和日志保存在 `runs/PEMS04/train` 中。
+
+## 测试模型
+
+修改配置文件中的两处，`model_state_pth`：要测试的模型权重文件路径，`has_saved_state`：true
+
+运行以下命令，即可开始进行测试，如：具体配置可以查看文件 `configs/pems04_demo.yaml`
+
+```shell script
+# pems04
+python run_demo.py --config_filename configs/pems04_demo.yaml
+
+# metr-la
+python run_demo.py --config_filename configs/metr-la_demo.yaml
+```

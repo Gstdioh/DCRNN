@@ -39,8 +39,8 @@ train:
   device: cuda  # ["cuda", "cpu"]
 
   # 模型载入和保存参数
-  has_saved_state: false  # 是否有权重文件
-  model_state_pth: null  # 模型权重文件，包含模型参数和训练状态 ['model_state_dict', 'epoch', 'optimizer_state_dict']
+  has_saved_state: true  # 是否有权重文件
+  model_state_pth: saved_model/best_epoch49.pth  # 模型权重文件，包含模型参数和训练状态 ['model_state_dict', 'epoch', 'optimizer_state_dict']
   save_model: true  # 是否保存模型参数和训练状态
 
   # 学习率相关参数
@@ -51,7 +51,7 @@ train:
 
   # 日志显示参数
   log_every: 1  # 每经过log_every（默认1）个epoch，显示一次训练和验证的结果
-  test_every_n_epochs: 10  # 每经过test_every_n_epochs（默认10）个epoch，显示一次测试的结果
+  test_every_n_epochs: 5  # 每经过test_every_n_epochs（默认10）个epoch，显示一次测试的结果
 
   epochs: 100  # 训练总epoch数
   patience: 50  # 若经过50epoch，loss还没有降低，则退出训练
