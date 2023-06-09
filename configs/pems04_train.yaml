@@ -57,7 +57,7 @@ train:
   patience: 50  # 若经过50epoch，loss还没有降低，则退出训练
   save_epoch: 10  # 每训练 save_epoch，则保存一次模型
 
-  epsilon: 1.0e-3
+  epsilon: 1.0e-3  # 表示一个小常数,用于防止除数为0
   global_step: 0
   max_grad_norm: 5
   max_to_keep: 100

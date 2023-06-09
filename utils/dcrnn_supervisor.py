@@ -40,13 +40,14 @@ class DCRNNSupervisor:
 
         # logging.
         # 日志参数
-        # self._log_dir = self._get_log_dir(kwargs)
-        # self._writer = SummaryWriter('runs/' + self._log_dir)
         self._log_dir = self.runs_path
         log_level = self._kwargs.get('log_level', 'INFO')  # 获取日志级别，默认为INFO
         # 创建logger，__name__表示运行文件名
         self._logger = utils.get_logger(log_dir=self._log_dir, name=__name__,
                                         log_filename='info.log', level=log_level)
+
+        # TODO tensorboard
+        # self._writer = SummaryWriter('runs/' + self._log_dir)
 
         # 每训练 save_epoch，则保存一次模型
         self.save_epoch = self._train_kwargs.get('save_epoch', 5)
@@ -191,7 +192,7 @@ class DCRNNSupervisor:
 
             mean_loss = np.mean(losses)
 
-            # TODO
+            # TODO tensorboard
             # self._writer.add_scalar('{} loss'.format(dataset), mean_loss, batches_seen)
 
             # 将输出结果返回，用于测试阶段
@@ -296,7 +297,7 @@ class DCRNNSupervisor:
 
             end_time = time.time()
 
-            # TODO
+            # TODO tensorboard
             # self._writer.add_scalar('training loss',
             #                         np.mean(losses),
             #                         batches_seen)
