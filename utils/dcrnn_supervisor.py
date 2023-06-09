@@ -59,7 +59,7 @@ class DCRNNSupervisor:
         _, _, self._adj_mx = utils.data.load_graph_data(self._data_kwargs.get('graph_pkl_filename'))
         # 载入数据集
         self._data = utils.data.load_dataset(**self._data_kwargs)
-        # self.standard_scaler = self._data['scaler']  # 标准化参数
+        self.standard_scaler = self._data['scaler']  # 标准化参数
 
         # 模型参数
         self.num_nodes = int(self._model_kwargs.get('num_nodes', 1))
@@ -175,10 +175,8 @@ class DCRNNSupervisor:
             # 保证日志输出整洁，0.1s
             time.sleep(0.1)
             for item in tqdm(self._data['{}_loader'.format(dataset)]):
-                x = item['x'].to(self.device)
-                y = item['y'].to(self.device)
-
-                # x, y = self._prepare_data(x, y)
+                # 预处理数据，包括维度的转换（如果需要）、放入 device
+                x, y = self._prepare_data(item['x'], item['y'])
 
                 # 注意，这里没有将 y 和 batches_seen 作为输入
                 # 因为在 val 和 test 阶段中，Decoder 都用的预测值作为输入
@@ -206,8 +204,8 @@ class DCRNNSupervisor:
             for t in range(y_preds.shape[1]):
                 # 归一化对所有的数据都要统一！！！
                 # 之前我是分别对train、val、test进行不同的归一化，见dcrnn_supervisor_src.py代码
-                y_truth = self._data['scaler'].inverse_transform(y_truths[:, t, :, :])
-                y_pred = self._data['scaler'].inverse_transform(y_preds[:, t, :, :])
+                y_truth = self.standard_scaler.inverse_transform(y_truths[:, t, :, :])
+                y_pred = self.standard_scaler.inverse_transform(y_preds[:, t, :, :])
                 y_truths_scaled.append(y_truth)
                 y_preds_scaled.append(y_pred)
 
@@ -253,8 +251,10 @@ class DCRNNSupervisor:
             # 保证日志输出整洁，0.1s
             time.sleep(0.1)
             for item in tqdm(self._data['train_loader']):
-                x = item['x'].to(self.device)  # (batch_size, history_length, num_nodes, 1)
-                y = item['y'].to(self.device)  # (batch_size, prediction_length, num_nodes, 1)
+                # 预处理数据，包括维度的转换（如果需要）、放入 device
+                # (batch_size, history_length, num_nodes, 2)
+                # (batch_size, prediction_length, num_nodes, 1)
+                x, y = self._prepare_data(item['x'], item['y'])
 
                 optimizer.zero_grad()
 
@@ -351,6 +351,15 @@ class DCRNNSupervisor:
     def _compute_loss(self, y_true, y_predicted):
         # 归一化对所有的数据都要统一！！！
         # 之前我是分别对train、val、test进行不同的归一化，见dcrnn_supervisor_src.py代码
-        y_true = self._data['scaler'].inverse_transform(y_true)
-        y_predicted = self._data['scaler'].inverse_transform(y_predicted)
+        y_true = self.standard_scaler.inverse_transform(y_true)
+        y_predicted = self.standard_scaler.inverse_transform(y_predicted)
         return masked_mae_loss(y_predicted, y_true)
+
+    def _prepare_data(self, x, y):
+        # x (batch_size, history_length(12), num_nodes, input_dim(2))
+        # y (batch_size, prediction_length(1), num_nodes, output_dim(1))
+
+        x = x.to(self.device)
+        y = y.to(self.device)
+
+        return x, y
