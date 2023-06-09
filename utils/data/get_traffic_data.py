@@ -75,12 +75,6 @@ class LoadData(Dataset):
 
         return {"x": data_x, "y": data_y}
 
-    def transform(self, data):
-        return (data - self.mean) / self.std
-
-    def inverse_transform(self, data):
-        return (data * self.std) + self.mean
-
     @staticmethod
     def to_tensor(data):
         return torch.tensor(data, dtype=torch.float)
