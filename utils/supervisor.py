@@ -12,7 +12,7 @@ from utils import metrics
 from model.dcrnn_model import DCRNNModel
 
 
-class DCRNNSupervisor:
+class Supervisor:
     def __init__(self, **kwargs):
         self._kwargs = kwargs
         self._data_kwargs = kwargs.get('data')

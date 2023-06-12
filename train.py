@@ -1,14 +1,14 @@
 import argparse
 import yaml
 
-from utils.dcrnn_supervisor import DCRNNSupervisor
+from utils.supervisor import Supervisor
 
 
 def main(args):
     with open(args.config_filename, 'r', encoding="utf-8") as f:
         supervisor_config = yaml.safe_load(f)
 
-        supervisor = DCRNNSupervisor(**supervisor_config)
+        supervisor = Supervisor(**supervisor_config)
 
         supervisor.train()
 
