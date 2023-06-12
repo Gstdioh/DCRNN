@@ -26,10 +26,10 @@ python prepare_data.py --config_filename configs/METR-LA/metr-la_prepare.yaml
 
 ```shell script
 # pems04
-python dcrnn_train.py --config_filename configs/PEMS04/pems04_train.yaml
+python train.py --config_filename configs/PEMS04/pems04_train.yaml
 
 # metr-la
-python dcrnn_train.py --config_filename configs/METR-LA/metr-la_train.yaml
+python train.py --config_filename configs/METR-LA/metr-la_train.yaml
 ```
 
 如：权重文件和日志保存在 `runs/PEMS04/train` 中。
