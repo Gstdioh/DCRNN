@@ -51,7 +51,7 @@ train:
 
   # 日志显示参数
   log_every: 1  # 每经过log_every（默认1）个epoch，显示一次训练和验证的结果
-  test_every_n_epochs: 5  # 每经过test_every_n_epochs（默认10）个epoch，显示一次测试的结果
+  test_every_n_epochs: 1  # 每经过test_every_n_epochs（默认10）个epoch，显示一次测试的结果
 
   epochs: 100  # 训练总epoch数
   patience: 50  # 若经过50epoch，loss还没有降低，则退出训练

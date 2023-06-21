@@ -214,7 +214,7 @@ class Supervisor:
 
     def _train(self, base_lr,
                steps, patience=50, epochs=100, lr_decay_ratio=0.1, log_every=1, save_model=True,
-               test_every_n_epochs=10, epsilon=1e-8, **kwargs):
+               test_every_n_epochs=1, epsilon=1e-8, **kwargs):
         # steps is used in learning rate - will see if need to use it?
         min_val_loss = float('inf')
         wait = 0
@@ -304,17 +304,18 @@ class Supervisor:
 
             # 每经过log_every（默认1）个epoch，显示一次训练和验证的结果
             if (epoch_num + 1) % log_every == 0:
-                base_message = 'Epoch [{}/{}] ({} batches_seen) '.format(epoch_num, epochs, batches_seen)
+                # base_message = 'Epoch [{}/{}] ({} batches_seen) '.format(epoch_num, epochs, batches_seen)
                 message = 'Epoch [{}/{}] ({} batches_seen) train_mae: {:.4f}, val_mae: {:.4f}, lr: {:.6f}, ' \
                           '{:.1f}s'.format(epoch_num, epochs, batches_seen,
                                            np.mean(losses), val_loss, lr_scheduler.get_last_lr()[0],
                                            (end_time - start_time))
                 self._logger.info(message)
 
+                # 验证过程不需要显示评价指标
                 # 输出评价指标：MAE、RMSE、MAPE
-                self.show_metrics(val_results['prediction'], val_results['truth'], base_message, 0.0)
+                # self.show_metrics(val_results['prediction'], val_results['truth'], base_message, 0.0)
 
-            # 每经过test_every_n_epochs（默认10）个epoch，显示一次测试的结果
+            # 每经过test_every_n_epochs（默认1）个epoch，显示一次测试的结果
             if (epoch_num + 1) % test_every_n_epochs == 0:
                 # 测试
                 test_loss, test_results = self.evaluate(dataset='test')
